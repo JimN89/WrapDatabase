@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WrapPrep – parts removal guides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#e9ebec;--card:#fff;--line:#d9dde0;--ink:#14181c;--mute:#5d676f;--tape:#f2c230;--bad:#c0392b;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#101214;--card:#1a1d20;--line:#2b3036;--ink:#eef1f3;--mute:#98a2ab}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Barlow,system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:760px;margin:0 auto}
+header{position:sticky;top:0;z-index:5;background:#1c2126;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+header h1{font-size:22px;margin:0;font-weight:700;cursor:pointer;flex:1}
+header h1 span{background:var(--tape);color:#14181c;padding:0 6px;margin-right:2px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:6px 12px;font-weight:500}
+header button{background:#2b3138;border-color:#3a424a;color:#fff}
+button.pri,header button.pri{background:var(--tape);color:#14181c;border-color:var(--tape);font-weight:700}
+button:disabled{opacity:.5}
+button.lnk{border:0;background:none;color:var(--mute);padding:4px 8px}
+:focus-visible{outline:2px solid var(--tape);outline-offset:2px}
+.crumbs{padding:10px 14px 0;font-size:14px;color:var(--mute)}
+.crumbs a{color:var(--ink);cursor:pointer;text-decoration:underline}
+.board{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:12px;overflow:hidden}
+.bh{background:#1c2126;color:var(--tape);padding:8px 12px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.bh small{color:#aab3ba;font-weight:400}
+.r2{display:grid;grid-template-columns:1fr auto;gap:0 12px;padding:11px 12px;border-top:1px solid var(--line);cursor:pointer}
+.r2:first-of-type{border-top:0}
+.r2:hover{background:var(--bg)}
+.t{font-weight:700;overflow-wrap:anywhere}.s{color:var(--mute);font-size:14px}.n{color:var(--mute);font-size:14px;text-align:right;white-space:nowrap;grid-row:1/3;grid-column:2;align-self:center}
+.pad{padding:12px}
+.pad input,.pad textarea,dialog input,#q{width:100%;border:1px solid var(--line);background:transparent;border-radius:6px;padding:9px 10px;margin-bottom:8px}
+.pad textarea{min-height:130px;resize:vertical;font-size:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{flex:1}
+.mute{color:var(--mute)}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.thumbs div{position:relative}.thumbs img{width:84px;height:84px;object-fit:cover;border-radius:6px;display:block}
+.thumbs b{position:absolute;top:2px;right:2px;background:#000c;color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;cursor:pointer}
+h2.gt{margin:6px 14px 0;font-size:24px;line-height:1.2}
+.pbox{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:12px;overflow:hidden}
+.ph{background:var(--bg);padding:7px 12px;display:flex;justify-content:space-between;font-size:14px;color:var(--mute)}.ph b{color:var(--ink)}
+.pb{padding:12px}.pb .pad{padding:0}
+.body{overflow-wrap:anywhere}
+.body img.inl,.imgs img{max-width:100%;border-radius:6px;display:block;margin:8px 0}
+.imgs{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(48%,1fr));margin-top:10px}
+.imgs img{width:100%;max-height:420px;object-fit:cover;margin:0}
+.acts{margin:8px 0 -6px -8px}
+.msg{padding:30px 14px;text-align:center;color:var(--mute)}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);width:min(92vw,360px);padding:18px}
+dialog::backdrop{background:#0008}
+.err{color:var(--bad);font-size:14px;margin:0 0 8px}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1 data-go="/"><span>Wrap</span>Prep</h1><div id="who" class="row"></div></header>
+<div id="app"><div class="msg">Loading…</div></div>
+</div>
+<input type="file" id="cam" accept="image/*" capture="environment">
+<input type="file" id="gal" accept="image/*" multiple>
+<datalist id="dlMake"></datalist><datalist id="dlModel"></datalist>
+<datalist id="dlPart"></datalist>
+
+<dialog id="auth">
+  <h2 style="margin-top:0">Join WrapPrep</h2>
+  <input id="aUser" placeholder="Username (new accounts)" autocomplete="username">
+  <input id="aMail" type="email" placeholder="Email" autocomplete="email">
+  <input id="aPass" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+  <p class="err" id="aErr"></p>
+  <div class="row"><button class="pri" id="aIn">Sign in</button><button id="aUp">Create account</button><span class="sp"></span><button class="lnk" id="aX">Close</button></div>
+</dialog>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const CFG = {
+  SUPABASE_URL: 'https://lfqjoptasnumpintrtvz.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmcWpvcHRhc251bXBpbnRydHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM5MzA2MDMsImV4cCI6MjEwOTUwNjYwM30.7olUbx4m1aKnTpcsqbGIcOoKcd_yxlN4dibL7sDFfno',
+  CLOUD_NAME: 'kw0ybcte',
+  UPLOAD_PRESET: 'WrapDatabase'
+};
+const MAKES=['Acura','Alfa Romeo','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Ford','Genesis','GMC','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Land Rover','Lexus','Lincoln','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Porsche','Ram','Rivian','Subaru','Tesla','Toyota','Volkswagen','Volvo'];
+const PARTS=['Front bumper','Rear bumper','Door handles','Side mirrors','Headlights','Tail lights','Emblems and badges','Side skirts','Fender','Hood','Trunk or tailgate','Roof antenna','Door panels','Trim and moldings','Fuel door'];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const P=(...a)=>'/'+a.map(encodeURIComponent).join('/');
+const J=(k,d)=>{try{return Object.assign(d,JSON.parse(localStorage.getItem(k)))}catch(e){return d}};
+const S=(k,v)=>{try{localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}};
+let sb,user=null,admin=false,G=[],RC={},cur=null,tgt='new',busy=false,t1;
+let D=J('wp-new',{make:'',model:'',year:'',part:'',title:'',body:'',images:[]});
+let RD={body:'',images:[]},ed=null,ET='',EI=[];
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1600)}
+function later(fn){clearTimeout(t1);t1=setTimeout(()=>{fn();toast('Draft saved')},600)}
+function fmt(t){return esc(t).replace(/https?:\/\/[^\s<]+/g,u=>/\.(jpe?g|png|gif|webp|avif)(\?|$)|res\.cloudinary\.com/i.test(u)?`<img class="inl" src="${u}" loading="lazy" alt="">`:'').replace(/\n/g,'<br>')}
+const opt=u=>u.replace('/upload/','/upload/f_auto,q_auto,w_1200/');
+function ago(d){const s=(Date.now()-new Date(d))/1000;if(s<60)return 'now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+const tc=s=>s===s.toLowerCase()?s.replace(/\b\w/g,c=>c.toUpperCase()):s;
+const clean=s=>s.trim().replace(/\s+/g,' ');
+function normMake(s){s=clean(s);return MAKES.find(m=>m.toLowerCase()===s.toLowerCase())||(G.find(g=>g.make.toLowerCase()===s.toLowerCase())||{}).make||tc(s)}
+function normModel(mk,s){s=clean(s);return (G.find(g=>g.make===mk&&g.model.toLowerCase()===s.toLowerCase())||{}).model||tc(s)}
+const th=(arr,k)=>arr.map((u,i)=>`<div><img src="${esc(opt(u))}" alt=""><b data-a="${k}" data-i="${i}">×</b></div>`).join('');
+const imgs=a=>a&&a.length?`<div class="imgs">${a.map(u=>`<img src="${esc(opt(u))}" loading="lazy" alt="">`).join('')}</div>`:'';
+
+// ---- Camera / upload ----
+async function shrink(f){const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);c.getContext('2d').drawImage(b,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.82))}
+async function upload(f){const fd=new FormData();fd.append('file',await shrink(f));fd.append('upload_preset',CFG.UPLOAD_PRESET);const r=await fetch(`https://api.cloudinary.com/v1_1/${CFG.CLOUD_NAME}/image/upload`,{method:'POST',body:fd});if(!r.ok)throw Error('Upload failed – check Cloudinary name and preset');return(await r.json()).secure_url}
+async function addFiles(files){
+  if(!files.length)return;busy=true;toast('Uploading…');
+  try{for(const f of files){const u=await upload(f);if(ed)EI.push(u);else if(tgt==='new')D.images.push(u);else RD.images.push(u)}
+    saveDrafts()}catch(e){toast(e.message)}
+  busy=false;route(true);
+}
+function saveDrafts(){S('wp-new',D);if(cur)S('wp-rep-'+cur.p.id,RD)}
+
+// ---- Data ----
+async function loadAll(){
+  const a=await sb.from('posts').select('id,user_id,author,make,model,year,part,title,vehicle,created_at').is('parent_id',null).order('created_at',{ascending:false}).limit(2000);
+  if(a.error)throw a.error;
+  G=a.data.map(g=>({...g,make:g.make||'Other',model:g.model||'General',title:g.title||g.vehicle||'Untitled'}));
+  const b=await sb.from('posts').select('parent_id').not('parent_id','is',null).limit(5000);
+  RC={};(b.data||[]).forEach(r=>RC[r.parent_id]=(RC[r.parent_id]||0)+1);
+  const ms=[...new Set([...MAKES,...G.map(g=>g.make)])].sort();
+  $('#dlMake').innerHTML=ms.map(m=>`<option value="${esc(m)}">`).join('');
+  $('#dlModel').innerHTML=[...new Set(G.map(g=>g.model))].sort().map(m=>`<option value="${esc(m)}">`).join('');
+  $('#dlPart').innerHTML=PARTS.map(m=>`<option value="${esc(m)}">`).join('');
+}
+
+// ---- Views ----
+const crumbs=a=>`<div class="crumbs">${a.map(([t,p])=>p?`<a data-go="${esc(p)}">${esc(t)}</a>`:esc(t)).join(' › ')}</div>`;
+const gRow=(g,sub)=>`<div class="r2" data-go="${esc(P('guide',g.id))}"><div class="t">${esc(g.title)}</div><div class="s">${esc(sub)}</div><div class="n">${RC[g.id]||0} replies</div></div>`;
+const gsub=g=>[g.part,g.year,'by '+g.author,ago(g.created_at)].filter(Boolean).join(' · ');
+
+function vHome(){
+  $('#app').innerHTML=`<div class="pad" style="padding-bottom:0"><input id="q" type="search" placeholder="Search a make, model, part or guide"></div><div id="res"></div>`;
+  res('');
+}
+function res(q){
+  q=q.toLowerCase().trim();let h='';
+  if(!q){
+    const mk={};G.forEach(g=>{const m=mk[g.make]||(mk[g.make]={mo:new Set(),n:0});m.mo.add(g.model);m.n++});
+    const keys=Object.keys(mk).sort();
+    h=`<div class="board"><div class="bh">Browse by make<small>${G.length} guides</small></div>`+(keys.length?keys.map(k=>`<div class="r2" data-go="${esc(P('make',k))}"><div class="t">${esc(k)}</div><div class="s">${mk[k].mo.size} model${mk[k].mo.size>1?'s':''}</div><div class="n">${mk[k].n} guide${mk[k].n>1?'s':''}</div></div>`).join(''):`<div class="msg">No guides yet. Be the first to post one.</div>`)+`</div>`;
+    if(G.length)h+=`<div class="board"><div class="bh">Latest guides</div>${G.slice(0,6).map(g=>gRow(g,g.make+' '+g.model+' · '+gsub(g))).join('')}</div>`;
+  }else{
+    const ms={};G.forEach(g=>{if((g.make+' '+g.model).toLowerCase().includes(q))ms[g.make+'|'+g.model]=[g.make,g.model]});
+    const gs=G.filter(g=>[g.make,g.model,g.title,g.part,g.year].join(' ').toLowerCase().includes(q));
+    h=(Object.keys(ms).length?`<div class="board"><div class="bh">Vehicles</div>${Object.values(ms).map(([a,b])=>`<div class="r2" data-go="${esc(P('make',a,b))}"><div class="t">${esc(a+' '+b)}</div></div>`).join('')}</div>`:'')+
+      `<div class="board"><div class="bh">Guides</div>${gs.length?gs.map(g=>gRow(g,g.make+' '+g.model+' · '+gsub(g))).join(''):'<div class="msg">Nothing found. Try a shorter search.</div>'}</div>`;
+  }
+  $('#res').innerHTML=h;
+}
+function vMake(mk){
+  const gs=G.filter(g=>g.make===mk),mo={};gs.forEach(g=>{(mo[g.model]||(mo[g.model]={n:0,l:g.created_at})).n++});
+  $('#app').innerHTML=crumbs([['Makes','/'],[mk]])+`<div class="board"><div class="bh">${esc(mk)} models</div>`+(Object.keys(mo).sort().map(m=>`<div class="r2" data-go="${esc(P('make',mk,m))}"><div class="t">${esc(m)}</div><div class="s">Latest ${ago(mo[m].l)}</div><div class="n">${mo[m].n} guide${mo[m].n>1?'s':''}</div></div>`).join('')||'<div class="msg">No models yet.</div>')+`</div>`;
+}
+function vModel(mk,m){
+  const gs=G.filter(g=>g.make===mk&&g.model===m);
+  $('#app').innerHTML=crumbs([['Makes','/'],[mk,P('make',mk)],[m]])+`<div class="board"><div class="bh">${esc(mk+' '+m)} guides<button class="pri" data-a="newfor" data-mk="${esc(mk)}" data-m="${esc(m)}">New guide</button></div>`+(gs.map(g=>gRow(g,gsub(g))).join('')||'<div class="msg">No guides yet.</div>')+`</div>`;
+}
+async function vGuide(id){
+  $('#app').innerHTML='<div class="msg">Loading…</div>';
+  const {data:p}=await sb.from('posts').select('*').eq('id',id).single();
+  if(!p){$('#app').innerHTML='<div class="msg">Guide not found.</div>';return}
+  const {data:rs}=await sb.from('posts').select('*').eq('parent_id',id).order('created_at');
+  cur={p,rs:rs||[]};RD=J('wp-rep-'+id,{body:'',images:[]});ed=null;drawGuide();
+}
+function pbox(p){
+  const can=user&&(user.id===p.user_id||admin),e=ed===p.id;
+  return `<section class="pbox"><div class="ph"><b>${esc(p.author)}</b><span>${ago(p.created_at)}${p.updated_at?' · edited':''}</span></div><div class="pb">`+
+  (e?`<div class="pad"><textarea id="eBody">${esc(ET)}</textarea><div class="thumbs">${th(EI,'erm')}</div><div class="row"><button class="pri" data-a="esave">Save changes</button><button data-a="ecancel">Cancel</button></div></div>`
+    :`<div class="body">${fmt(p.body)}</div>${imgs(p.images)}`)+
+  (can&&!e?`<div class="acts"><button class="lnk" data-a="edit" data-id="${p.id}">Edit</button><button class="lnk" data-a="del" data-id="${p.id}">Delete</button></div>`:'')+`</div></section>`;
+}
+function drawGuide(){
+  const {p,rs}=cur;
+  $('#app').innerHTML=crumbs([['Makes','/'],[p.make||'Other',P('make',p.make||'Other')],[p.model||'General',P('make',p.make||'Other',p.model||'General')],[p.title||p.vehicle||'Guide']])+
+  `<h2 class="gt">${esc(p.title||p.vehicle||'Untitled')}</h2><div class="crumbs">${esc([p.part,p.year].filter(Boolean).join(' · '))}</div>`+
+  pbox(p)+(rs.length?`<div class="crumbs">${rs.length} repl${rs.length>1?'ies':'y'}</div>`:'')+rs.map(pbox).join('')+
+  (user?`<div class="board"><div class="bh">Reply</div><div class="pad"><textarea id="rBody" placeholder="Add a tip, a correction or your own photos">${esc(RD.body)}</textarea><div class="thumbs">${th(RD.images,'rrm')}</div><div class="row"><button data-a="cam" data-t="reply">Camera</button><button data-a="gal" data-t="reply">Photos</button><span class="sp"></span><button class="pri" data-a="rsend" ${busy?'disabled':''}>Post reply</button></div></div></div>`:`<div class="msg">Sign in to reply.</div>`);
+}
+function vNew(){
+  if(!user){$('#app').innerHTML='<div class="msg">Sign in to post a guide.</div>';$('#auth').showModal();return}
+  $('#app').innerHTML=crumbs([['Makes','/'],['New guide']])+`<div class="board"><div class="bh">New guide</div><div class="pad">
+  <div class="two"><input id="nMake" list="dlMake" placeholder="Make (Honda)" value="${esc(D.make)}"><input id="nModel" list="dlModel" placeholder="Model (Civic)" value="${esc(D.model)}"></div>
+  <div class="two"><input id="nYear" placeholder="Year or range (2016–2021)" value="${esc(D.year)}"><input id="nPart" list="dlPart" placeholder="Part (Front bumper)" value="${esc(D.part)}"></div>
+  <input id="nTitle" placeholder="Guide title" value="${esc(D.title)}">
+  <textarea id="nBody" placeholder="Tools needed, steps, clip locations, things to watch for…">${esc(D.body)}</textarea>
+  <div class="thumbs">${th(D.images,'nrm')}</div>
+  <div class="row"><button data-a="cam" data-t="new">Camera</button><button data-a="gal" data-t="new">Photos</button><span class="sp mute">${busy?'Uploading…':''}</span><button class="pri" data-a="npost" ${busy?'disabled':''}>Post guide</button></div></div></div>`;
+}
+
+// ---- Router ----
+function route(keep){
+  const a=location.hash.slice(2).split('/').filter(Boolean).map(decodeURIComponent);
+  if(!keep)ed=null;
+  if(!a.length)return vHome();
+  if(a[0]==='make')return a[2]?vModel(a[1],a[2]):vMake(a[1]);
+  if(a[0]==='guide')return keep&&cur&&cur.p.id===a[1]?drawGuide():vGuide(a[1]);
+  if(a[0]==='new')return vNew();
+  vHome();
+}
+window.addEventListener('hashchange',()=>route());
+function head(){
+  $('#who').innerHTML=user?`<button class="pri" data-a="new">New guide</button><span style="font-size:14px">${esc(user.user_metadata?.username||user.email)}${admin?' (admin)':''}</span><button data-a="out">Sign out</button>`:`<button class="pri" data-a="in">Sign in</button>`;
+}
+
+// ---- Events ----
+document.addEventListener('input',e=>{
+  const i=e.target.id,v=e.target.value,m={nMake:'make',nModel:'model',nYear:'year',nPart:'part',nTitle:'title',nBody:'body'};
+  if(i==='q')res(v);
+  if(m[i]){D[m[i]]=v;later(saveDrafts)}
+  if(i==='rBody'){RD.body=v;later(saveDrafts)}
+  if(i==='eBody'){ET=v;later(()=>S('wp-edit-'+ed,v))}
+});
+document.addEventListener('change',e=>{if(e.target.id==='cam'||e.target.id==='gal'){addFiles([...e.target.files]);e.target.value=''}});
+const dn=()=>{const m=cur;return m};
+document.addEventListener('click',async e=>{
+  const g=e.target.closest('[data-go]');if(g){location.hash=g.dataset.go;return}
+  const t=e.target,a=t.dataset.a;if(!a)return;
+  if(t.dataset.t)tgt=t.dataset.t;
+  if(a==='in')$('#auth').showModal();
+  if(a==='out')await sb.auth.signOut();
+  if(a==='new'){location.hash='/new'}
+  if(a==='newfor'){D.make=t.dataset.mk;D.model=t.dataset.m;S('wp-new',D);location.hash='/new'}
+  if(a==='cam')$('#cam').click();
+  if(a==='gal')$('#gal').click();
+  if(a==='nrm'){D.images.splice(+t.dataset.i,1);saveDrafts();vNew()}
+  if(a==='rrm'){RD.images.splice(+t.dataset.i,1);saveDrafts();drawGuide()}
+  if(a==='erm'){EI.splice(+t.dataset.i,1);drawGuide()}
+  if(a==='npost'){
+    if(!user)return;
+    const mk=normMake(D.make),mo=normModel(mk,D.model),ti=clean(D.title);
+    if(!mk||!mo||!ti)return toast('Add a make, model and title');
+    if(!D.body.trim()&&!D.images.length)return toast('Add some text or a photo');
+    const {data,error}=await sb.from('posts').insert({author:user.user_metadata?.username||user.email.split('@')[0],make:mk,model:mo,year:clean(D.year)||null,part:clean(D.part)||null,title:ti,body:D.body.trim(),images:D.images}).select('id').single();
+    if(error)return toast(error.message);
+    D={make:'',model:'',year:'',part:'',title:'',body:'',images:[]};S('wp-new',D);await loadAll();location.hash=P('guide',data.id);toast('Posted');
+  }
+  if(a==='rsend'){
+    if(!RD.body.trim()&&!RD.images.length)return toast('Write something first');
+    const {data,error}=await sb.from('posts').insert({author:user.user_metadata?.username||user.email.split('@')[0],parent_id:cur.p.id,body:RD.body.trim(),images:RD.images}).select().single();
+    if(error)return toast(error.message);
+    cur.rs.push(data);RD={body:'',images:[]};S('wp-rep-'+cur.p.id,RD);drawGuide();loadAll();
+  }
+  if(a==='edit'){const p=[cur.p,...cur.rs].find(x=>x.id===t.dataset.id);ed=p.id;ET=localStorage.getItem('wp-edit-'+p.id)??p.body;EI=[...(p.images||[])];drawGuide()}
+  if(a==='ecancel'){try{localStorage.removeItem('wp-edit-'+ed)}catch(x){}ed=null;drawGuide()}
+  if(a==='esave'){
+    const body=$('#eBody').value.trim(),now=new Date().toISOString();
+    const {error}=await sb.from('posts').update({body,images:EI,updated_at:now}).eq('id',ed);
+    if(error)return toast(error.message);
+    const p=[cur.p,...cur.rs].find(x=>x.id===ed);Object.assign(p,{body,images:EI,updated_at:now});
+    try{localStorage.removeItem('wp-edit-'+ed)}catch(x){}ed=null;drawGuide();toast('Saved');
+  }
+  if(a==='del'&&confirm('Delete this post?')){
+    const id=t.dataset.id,{error}=await sb.from('posts').delete().eq('id',id);
+    if(error)return toast(error.message);
+    if(id===cur.p.id){const mk=cur.p.make||'Other',mo=cur.p.model||'General';await loadAll();location.hash=P('make',mk,mo)}
+    else{cur.rs=cur.rs.filter(r=>r.id!==id);drawGuide();loadAll()}
+  }
+});
+
+// ---- Auth ----
+$('#aX').onclick=()=>$('#auth').close();
+$('#aIn').onclick=async()=>{const{error}=await sb.auth.signInWithPassword({email:$('#aMail').value,password:$('#aPass').value});error?$('#aErr').textContent=error.message:$('#auth').close()};
+$('#aUp').onclick=async()=>{const username=$('#aUser').value.trim();if(!username){$('#aErr').textContent='Pick a username first.';return}
+  const{error}=await sb.auth.signUp({email:$('#aMail').value,password:$('#aPass').value,options:{data:{username}}});
+  $('#aErr').textContent=error?error.message:'Check your email to confirm, then sign in.'};
+async function setUser(u){
+  user=u;admin=false;
+  if(u){const{data}=await sb.from('admins').select('user_id').eq('user_id',u.id);admin=!!(data&&data.length)}
+  head();route(true);
+}
+
+// ---- Start ----
+(async()=>{
+  try{
+    sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
+    // Never query the database inside this callback: it deadlocks supabase-js, which caused the endless "Loading…".
+    sb.auth.onAuthStateChange((ev,s)=>{if(ev==='INITIAL_SESSION')return;setTimeout(()=>setUser(s?.user??null),0)});
+    const{data}=await sb.auth.getSession();
+    await loadAll();
+    await setUser(data.session?.user??null);
+    route();
+  }catch(e){$('#app').innerHTML=`<div class="msg">Couldn’t load: ${esc(e.message||e)}<br>Run migrate.sql in Supabase, then refresh.</div>`}
+})();
+</script>
+</body>
+</html>
